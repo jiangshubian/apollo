@@ -15,6 +15,16 @@ public class ItemDTO extends BaseDTO{
 
   private int lineNum;
 
+  private String signValue;
+
+  public String getSignValue() {
+    return signValue;
+  }
+
+  public void setSignValue(String signValue) {
+    this.signValue = signValue;
+  }
+
   public ItemDTO() {
 
   }

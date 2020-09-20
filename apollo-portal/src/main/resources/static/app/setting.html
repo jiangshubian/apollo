@@ -112,6 +112,16 @@
                                     <small>{{'App.Setting.ProjectNameTips' | translate }}</small>
                                 </div>
                             </div>
+                            <div class="form-group" valdr-form-group>
+                                <label class="col-sm-2 control-label">
+                                    <apollorequiredfield></apollorequiredfield>
+                                    {{'App.Setting.appBelongName' | translate }}
+                                </label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" name="appBelongName" ng-model="viewApp.appBelongName"
+                                           ng-disabled="!display.app.edit">
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">
                                     <apollorequiredfield></apollorequiredfield>

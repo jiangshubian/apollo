@@ -65,8 +65,24 @@ function createAppController($scope, $window, $translate, toastr, AppService, Ap
             return;
         }
 
+
+        var appIdReg =/^[a-zA-Z][a-zA-Z0-9.-_]+$/;
+        if(!appIdReg.test($scope.app.appId)){
+            toastr.warning($translate.instant('Common.PleaseInputAppid'));
+            $scope.submitBtnDisabled = false;
+            return;
+        }
+
+
         $scope.app.orgId = selectedOrg.id;
         $scope.app.orgName = selectedOrg.name;
+
+        var regName =/^[\u4e00-\u9fa5]{2,8}$/;
+        if(!regName.test($scope.app.appBelongName)){
+            toastr.warning($translate.instant('Common.PleaseInputAppBelongName'));
+            $scope.submitBtnDisabled = false;
+            return;
+        }
 
         // owner
         var owner = $('.ownerSelector').select2('data')[0];

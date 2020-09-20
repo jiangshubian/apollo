@@ -29,6 +29,16 @@ public class AppModel {
 
   private Set<String> admins;
 
+  private String appBelongName;
+
+  public String getAppBelongName() {
+    return appBelongName;
+  }
+
+  public void setAppBelongName(String appBelongName) {
+    this.appBelongName = appBelongName;
+  }
+
   public String getName() {
     return name;
   }

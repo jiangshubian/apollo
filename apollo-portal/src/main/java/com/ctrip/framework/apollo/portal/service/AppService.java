@@ -73,8 +73,8 @@ public class AppService {
     return new PageDTO<>(apps.getContent(), pageable, apps.getTotalElements());
   }
 
-  public PageDTO<App> searchByAppIdOrAppName(String query, Pageable pageable) {
-    Page<App> apps = appRepository.findByAppIdContainingOrNameContaining(query, query, pageable);
+  public PageDTO<App> searchByAppIdOrAppBelongName(String query, Pageable pageable) {
+    Page<App> apps = appRepository.findByAppIdContainingOrAppBelongNameContaining(query, query, pageable);
 
     return new PageDTO<>(apps.getContent(), pageable, apps.getTotalElements());
   }

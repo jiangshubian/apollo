@@ -2,6 +2,7 @@ package com.ctrip.framework.apollo.portal.spi.configuration;
 
 import com.ctrip.framework.apollo.common.condition.ConditionalOnMissingProfile;
 import com.ctrip.framework.apollo.core.utils.StringUtils;
+import com.ctrip.framework.apollo.common.interceptor.IntegrateProperty;
 import com.ctrip.framework.apollo.portal.component.config.PortalConfig;
 import com.ctrip.framework.apollo.portal.spi.LogoutHandler;
 import com.ctrip.framework.apollo.portal.spi.SsoHeartbeatHandler;
@@ -21,6 +22,7 @@ import com.ctrip.framework.apollo.portal.spi.ldap.LdapUserService;
 import com.ctrip.framework.apollo.portal.spi.springsecurity.SpringSecurityUserInfoHolder;
 import com.ctrip.framework.apollo.portal.spi.springsecurity.SpringSecurityUserService;
 import com.google.common.collect.Maps;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -206,7 +208,9 @@ public class AuthConfiguration {
    */
   @Configuration
   @Profile("auth")
-  static class SpringSecurityAuthAutoConfiguration {
+  static class SpringSecurityAuthAutoConfiguration { 
+      @Autowired
+      private IntegrateProperty dbProperty;
 
     @Bean
     @ConditionalOnMissingBean(SsoHeartbeatHandler.class)
@@ -231,23 +235,23 @@ public class AuthConfiguration {
         DataSource datasource) throws Exception {
       JdbcUserDetailsManager jdbcUserDetailsManager = auth.jdbcAuthentication()
           .passwordEncoder(new BCryptPasswordEncoder()).dataSource(datasource)
-          .usersByUsernameQuery("select Username,Password,Enabled from `Users` where Username = ?")
+          .usersByUsernameQuery("select Username,Password,Enabled from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` where Username = ?")
           .authoritiesByUsernameQuery(
-              "select Username,Authority from `Authorities` where Username = ?")
+              "select Username,Authority from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "authorities" : "Authorities") + "` where Username = ?")
           .getUserDetailsService();
 
-      jdbcUserDetailsManager.setUserExistsSql("select Username from `Users` where Username = ?");
+      jdbcUserDetailsManager.setUserExistsSql("select Username from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` where Username = ?");
       jdbcUserDetailsManager
-          .setCreateUserSql("insert into `Users` (Username, Password, Enabled) values (?,?,?)");
+          .setCreateUserSql("insert into `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` (Username, Password, Enabled) values (?,?,?)");
       jdbcUserDetailsManager
-          .setUpdateUserSql("update `Users` set Password = ?, Enabled = ? where id = (select u.id from (select id from `Users` where Username = ?) as u)");
-      jdbcUserDetailsManager.setDeleteUserSql("delete from `Users` where id = (select u.id from (select id from `Users` where Username = ?) as u)");
+          .setUpdateUserSql("update `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` set Password = ?, Enabled = ? where id = (select u.id from (select id from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` where Username = ?) as u)");
+      jdbcUserDetailsManager.setDeleteUserSql("delete from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` where id = (select u.id from (select id from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` where Username = ?) as u)");
       jdbcUserDetailsManager
-          .setCreateAuthoritySql("insert into `Authorities` (Username, Authority) values (?,?)");
+          .setCreateAuthoritySql("insert into `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "authorities" : "Authorities") + "` (Username, Authority) values (?,?)");
       jdbcUserDetailsManager
-          .setDeleteUserAuthoritiesSql("delete from `Authorities` where id in (select a.id from (select id from `Authorities` where Username = ?) as a)");
+          .setDeleteUserAuthoritiesSql("delete from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "authorities" : "Authorities") + "` where id in (select a.id from (select id from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "authorities" : "Authorities") + "` where Username = ?) as a)");
       jdbcUserDetailsManager
-          .setChangePasswordSql("update `Users` set Password = ? where id = (select u.id from (select id from `Users` where Username = ?) as u)");
+          .setChangePasswordSql("update `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` set Password = ? where id = (select u.id from (select id from `" + dbProperty.getPrefixTablename() + (dbProperty.isTablenameTolowercase() ? "users" : "Users") + "` where Username = ?) as u)");
 
       return jdbcUserDetailsManager;
     }

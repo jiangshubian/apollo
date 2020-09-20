@@ -21,6 +21,15 @@ function appValdr(valdrProvider) {
                 'required': {
                     'message': 'Valdr.App.appName.Required'
                 }
+            },
+            'appBelongName': {
+                'size': {
+                    'max': 64,
+                    'message': 'Valdr.App.appBelongName.Size'
+                },
+                'required': {
+                    'message': 'Valdr.App.appBelongName.Required'
+                }
             }
         }
     })

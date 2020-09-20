@@ -15,6 +15,8 @@ import com.ctrip.framework.apollo.portal.entity.vo.NamespaceIdentifier;
 import com.ctrip.framework.apollo.portal.service.ItemService;
 import com.ctrip.framework.apollo.portal.service.NamespaceService;
 import com.ctrip.framework.apollo.portal.spi.UserInfoHolder;
+import com.ctrip.framework.apollo.portal.util.OptimizeUtils;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -97,6 +100,12 @@ public class ItemController {
                          @RequestBody ItemDTO item) {
     checkModel(isValidItem(item));
 
+    //OptimizeUtils校验
+    ItemDTO itemDTO = configService.loadItem(Env.valueOf(env), appId, clusterName, namespaceName, item.getKey());
+    if(OptimizeUtils.compareValue(item.getValue(),itemDTO.getValue())){
+      return;
+    }
+
     String username = userInfoHolder.getUser().getUserId();
     item.setDataChangeLastModifiedBy(username);
 
@@ -130,7 +139,7 @@ public class ItemController {
       return Collections.emptyList();
     }
 
-    List<ItemDTO> items = configService.findItems(appId, Env.valueOf(env), clusterName, namespaceName);
+    List<ItemDTO> items = OptimizeUtils.hidePassFromItemDTOLists(configService.findItems(appId, Env.valueOf(env), clusterName, namespaceName));
     if ("lastModifiedTime".equals(orderBy)) {
       items.sort((o1, o2) -> {
         if (o1.getDataChangeLastModifiedTime().after(o2.getDataChangeLastModifiedTime())) {
@@ -196,7 +205,17 @@ public class ItemController {
       }
     }
     if (hasPermission) {
-      configService.syncItems(model.getSyncToNamespaces(), model.getSyncItems());
+      //新增list存放原始ItemDTO数据 20190521_jiangshubian
+      List<ItemDTO> newItemDTO = Lists.newArrayList();
+      for(ListIterator<ItemDTO> syncItems = model.getSyncItems().listIterator(); syncItems.hasNext();){
+        ItemDTO itemDTO = syncItems.next();
+        if(OptimizeUtils.isContainPass(itemDTO.getKey())){
+          newItemDTO.add(configService.loadItemById(envNoPermission,itemDTO.getId()));
+        }else {
+          newItemDTO.add(itemDTO);
+        }
+      }
+      configService.syncItems(model.getSyncToNamespaces(), newItemDTO);
       return ResponseEntity.status(HttpStatus.OK).build();
     }
     throw new AccessDeniedException(String.format("You don't have the permission to modify environment: %s", envNoPermission));

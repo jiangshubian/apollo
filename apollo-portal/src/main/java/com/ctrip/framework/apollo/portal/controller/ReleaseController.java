@@ -15,6 +15,8 @@ import com.ctrip.framework.apollo.portal.spi.UserInfoHolder;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+
+import com.ctrip.framework.apollo.portal.util.OptimizeUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -149,7 +151,7 @@ public class ReleaseController {
       return Collections.emptyList();
     }
 
-    return releaseService.findActiveReleases(appId, Env.valueOf(env), clusterName, namespaceName, page, size);
+    return OptimizeUtils.hidePassFromReleasesDTOLists(releaseService.findActiveReleases(appId, Env.valueOf(env), clusterName, namespaceName, page, size));
   }
 
   @GetMapping(value = "/envs/{env}/releases/compare")
@@ -157,7 +159,7 @@ public class ReleaseController {
                                              @RequestParam long baseReleaseId,
                                              @RequestParam long toCompareReleaseId) {
 
-    return releaseService.compare(Env.valueOf(env), baseReleaseId, toCompareReleaseId);
+    return OptimizeUtils.hidePassFromReleaseCompareResult(releaseService.compare(Env.valueOf(env), baseReleaseId, toCompareReleaseId));
   }
 
 

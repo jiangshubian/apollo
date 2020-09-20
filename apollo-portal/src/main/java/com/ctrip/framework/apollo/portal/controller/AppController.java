@@ -85,7 +85,7 @@ public class AppController {
     if (StringUtils.isEmpty(query)) {
       return appService.findAll(pageable);
     }
-    return appService.searchByAppIdOrAppName(query, pageable);
+    return appService.searchByAppIdOrAppBelongName(query, pageable);
   }
 
   @GetMapping("/by-owner")
@@ -210,6 +210,7 @@ public class AppController {
     String ownerName = appModel.getOwnerName();
     String orgId = appModel.getOrgId();
     String orgName = appModel.getOrgName();
+    String appBelongName = appModel.getAppBelongName();
 
     return App.builder()
         .appId(appId)
@@ -217,6 +218,7 @@ public class AppController {
         .ownerName(ownerName)
         .orgId(orgId)
         .orgName(orgName)
+        .appBelongName(appBelongName)
         .build();
 
   }

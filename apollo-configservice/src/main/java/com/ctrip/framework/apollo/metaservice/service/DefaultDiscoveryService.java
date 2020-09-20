@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -20,6 +22,9 @@ import org.springframework.util.CollectionUtils;
 @ConditionalOnMissingProfile({"kubernetes"})
 public class DefaultDiscoveryService implements DiscoveryService {
 
+  @Autowired
+  CusExtService cusExtService;
+
   private final EurekaClient eurekaClient;
 
   public DefaultDiscoveryService(final EurekaClient eurekaClient) {
@@ -28,9 +33,9 @@ public class DefaultDiscoveryService implements DiscoveryService {
 
   @Override
   public List<ServiceDTO> getServiceInstances(String serviceId) {
-    Application application = eurekaClient.getApplication(serviceId);
+    Application application = eurekaClient.getApplication(serviceId + cusExtService.getAppEurekaRegisterSuffixName());
     if (application == null || CollectionUtils.isEmpty(application.getInstances())) {
-      Tracer.logEvent("Apollo.Discovery.NotFound", serviceId);
+      Tracer.logEvent("Apollo.Discovery.NotFound", serviceId + cusExtService.getAppEurekaRegisterSuffixName());
       return Collections.emptyList();
     }
     return application.getInstances().stream().map(instanceInfoToServiceDTOFunc)

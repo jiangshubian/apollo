@@ -40,7 +40,7 @@ directive_module.directive('apollonav',
                                     data.content.forEach(function (app) {
                                         result.push({
                                             id: app.appId,
-                                            text: app.appId + ' / ' + app.name
+                                            text: app.appId + '/' + app.appBelongName + '/' + app.name
                                         })
                                     });
                                     return {

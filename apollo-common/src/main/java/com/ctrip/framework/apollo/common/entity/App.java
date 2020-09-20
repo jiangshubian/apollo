@@ -42,6 +42,18 @@ public class App extends BaseEntity {
   @Column(name = "OwnerEmail", nullable = false)
   private String ownerEmail;
 
+  @NotBlank(message = "AppBelongName cannot be blank")
+  @Column(name = "AppBelongName", nullable = false)
+  private String appBelongName;
+
+  public String getAppBelongName() {
+    return appBelongName;
+  }
+
+  public void setAppBelongName(String appBelongName) {
+    this.appBelongName = appBelongName;
+  }
+
   public String getAppId() {
     return appId;
   }
@@ -95,7 +107,7 @@ public class App extends BaseEntity {
         .add("orgId", orgId)
         .add("orgName", orgName)
         .add("ownerName", ownerName)
-        .add("ownerEmail", ownerEmail).toString();
+        .add("ownerEmail", ownerEmail).add("appBelongName", appBelongName).toString();
   }
 
   public static class Builder {
@@ -132,6 +144,11 @@ public class App extends BaseEntity {
 
     public Builder ownerEmail(String ownerEmail) {
       app.setOwnerEmail(ownerEmail);
+      return this;
+    }
+
+    public Builder appBelongName(String appBelongName) {
+      app.setAppBelongName(appBelongName);
       return this;
     }
 

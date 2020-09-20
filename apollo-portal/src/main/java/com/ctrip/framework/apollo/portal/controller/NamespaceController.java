@@ -21,6 +21,7 @@ import com.ctrip.framework.apollo.portal.service.AppNamespaceService;
 import com.ctrip.framework.apollo.portal.service.NamespaceService;
 import com.ctrip.framework.apollo.portal.service.RoleInitializationService;
 import com.ctrip.framework.apollo.portal.spi.UserInfoHolder;
+import com.ctrip.framework.apollo.portal.util.OptimizeUtils;
 import com.ctrip.framework.apollo.tracer.Tracer;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -94,6 +95,7 @@ public class NamespaceController {
       if (permissionValidator.shouldHideConfigToCurrentUser(appId, env, namespaceBO.getBaseInfo().getNamespaceName())) {
         namespaceBO.hideItems();
       }
+      OptimizeUtils.hidePassFromNamespaceBO(namespaceBO);
     }
 
     return namespaceBOs;
@@ -109,6 +111,10 @@ public class NamespaceController {
       namespaceBO.hideItems();
     }
 
+    if (namespaceBO != null) {
+      OptimizeUtils.hidePassFromNamespaceBO(namespaceBO);
+    }
+
     return namespaceBO;
   }
 
@@ -118,7 +124,7 @@ public class NamespaceController {
                                                                @PathVariable String namespaceName,
                                                                @PathVariable String clusterName) {
 
-    return namespaceService.findPublicNamespaceForAssociatedNamespace(Env.valueOf(env), appId, clusterName, namespaceName);
+    return OptimizeUtils.hidePassFromNamespaceBO(namespaceService.findPublicNamespaceForAssociatedNamespace(Env.valueOf(env), appId, clusterName, namespaceName));
   }
 
   @PreAuthorize(value = "@permissionValidator.hasCreateNamespacePermission(#appId)")

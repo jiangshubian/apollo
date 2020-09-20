@@ -23,6 +23,16 @@ public class AppDTO extends BaseDTO{
 
   private String ownerEmail;
 
+  private String appBelongName;
+
+  public String getAppBelongName() {
+    return appBelongName;
+  }
+
+  public void setAppBelongName(String appBelongName) {
+    this.appBelongName = appBelongName;
+  }
+
   public long getId() {
     return id;
   }

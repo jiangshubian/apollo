@@ -7,6 +7,8 @@ import com.ctrip.framework.apollo.portal.service.CommitService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+
+import com.ctrip.framework.apollo.portal.util.OptimizeUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +39,6 @@ public class CommitController {
       return Collections.emptyList();
     }
 
-    return commitService.find(appId, Env.valueOf(env), clusterName, namespaceName, page, size);
+    return OptimizeUtils.hidePassFromCommitDTOLists(commitService.find(appId, Env.valueOf(env), clusterName, namespaceName, page, size));
   }
 }

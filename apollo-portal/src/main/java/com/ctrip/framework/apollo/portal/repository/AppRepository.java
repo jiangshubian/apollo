@@ -22,7 +22,7 @@ public interface AppRepository extends PagingAndSortingRepository<App, Long> {
 
   List<App> findByAppIdIn(Set<String> appIds, Pageable pageable);
 
-  Page<App> findByAppIdContainingOrNameContaining(String appId, String name, Pageable pageable);
+  Page<App> findByAppIdContainingOrAppBelongNameContaining(String appId, String appBelongName, Pageable pageable);
 
   @Modifying
   @Query("UPDATE App SET IsDeleted=1,DataChange_LastModifiedBy = ?2 WHERE AppId=?1")
